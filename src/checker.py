@@ -1,3 +1,15 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         ::::::::             #
+#    checker.py                                         :+:    :+:             #
+#                                                      +:+                     #
+#    By: dmeijer <dmeijer@student.codam.nl>           +#+                      #
+#                                                    +#+                       #
+#    Created: 2021/12/15 16:00:27 by dmeijer       #+#    #+#                  #
+#    Updated: 2021/12/15 16:00:27 by dmeijer       ########   odam.nl          #
+#                                                                              #
+# **************************************************************************** #
+
 from collections import deque
 
 class PushSwapObject:

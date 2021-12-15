@@ -27,3 +27,5 @@ obj/
 *.out
 *.txt
 .idea/
+__pycache__/
+deepthought

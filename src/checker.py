@@ -6,11 +6,12 @@
 #    By: dmeijer <dmeijer@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2021/12/15 16:00:27 by dmeijer       #+#    #+#                  #
-#    Updated: 2021/12/15 16:00:27 by dmeijer       ########   odam.nl          #
+#    Updated: 2021/12/15 16:25:58 by dmeijer       ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
 from collections import deque
+from platform import python_branch
 
 class PushSwapObject:
 	stackA = deque()
@@ -24,23 +25,23 @@ class PushSwapObject:
 		for x in arr:
 			self.stackA.append(x)
 
-	def ra(self, val = 1):
+	def ra(self, val = -1):
 		self.stackA.rotate(val)
 	
-	def rb(self, val = 1):
+	def rb(self, val = -1):
 		self.stackB.rotate(val)
 	
-	def rr(self, val = 1):
+	def rr(self, val = -1):
 		self.ra(val)
 		self.rb(val)
 
-	def rra(self, val = 1):
+	def rra(self, val = -1):
 		self.ra(-val)
 	
-	def rrb(self, val = 1):
+	def rrb(self, val = -1):
 		self.rb(-val)
 
-	def rrr(self, val = 1):
+	def rrr(self, val = -1):
 		self.rr(-val)
 	
 	def pa(self):
@@ -67,13 +68,15 @@ class PushSwapObject:
 
 	def printa(self):
 		for x in self.stackA:
-			print("{} ".format(x))
+			print("{} ".format(x), end=";")
+		print("")
 
 	def printb(self):
 		for x in self.stackB:
-			print("{} ".format(x))
-	
+			print("{} ".format(x), end=";")
+		print("")
+
 	def is_sorted(self) -> bool:
 		if len(self.stackB) != 0:
 			return False
-		return sorted(self.stackA) == self.stackA
+		return sorted(self.stackA) == list(self.stackA)

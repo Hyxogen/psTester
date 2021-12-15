@@ -6,7 +6,7 @@
 #    By: dmeijer <dmeijer@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2021/12/15 16:00:24 by dmeijer       #+#    #+#                  #
-#    Updated: 2021/12/15 16:00:25 by dmeijer       ########   odam.nl          #
+#    Updated: 2021/12/15 16:26:22 by dmeijer       ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,9 +31,10 @@ def test(exec: str, argv, n) -> int:
 	instructions = proc.stdout.split("\n")
 	if proc.returncode != 0:
 		return -1
-	if execute_instructions(instructions, obj) == False:
+	ret = execute_instructions(instructions, obj)
+	if ret == False:
 		return -1
-	if obj.is_sorted == False:
+	if obj.is_sorted() == False:
 		return -1
 	return len(instructions)
 
@@ -54,19 +55,28 @@ def execute_instruction(instr: str, object: PushSwapObject) -> bool:
 		object.sa()
 	elif instr == "sb":
 		object.sb()
-	elif instr == "sa":
-		object.rr()
+	elif instr == "ss":
+		object.ss()
 	elif instr == "rra":
 		object.rra()
 	elif instr == "rrb":
 		object.rrb()
 	elif instr == "rrr":
 		object.rrr()
+	elif instr == "pb":
+		object.pb()
+	elif instr == "pa":
+		object.pa()
+	elif instr == "":#TODO just not parse this instruction
+		return True
 	else:
+		print("Unkown instruction:{}".format(instr))
 		return False
 	return True
 
-if test(executable, args, numbers) == False:
+ret = test(executable, args, numbers)
+
+if ret <= -1:
 	print("KO")
 else:
-	print("OK")
+	print("OK[{}]".format(ret))

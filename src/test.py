@@ -6,7 +6,7 @@
 #    By: dmeijer <dmeijer@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2021/12/15 16:00:24 by dmeijer       #+#    #+#                  #
-#    Updated: 2021/12/15 16:26:22 by dmeijer       ########   odam.nl          #
+#    Updated: 2021/12/15 16:27:38 by dmeijer       ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,8 +22,6 @@ args.pop(0)
 executable = args.pop(0)
 for arg in args:
 	numbers.append(int(arg))
-
-# print("Exec:{} numbers:{}".format(executable, numbers))
 
 def test(exec: str, argv, n) -> int:
 	obj = PushSwapObject(n)

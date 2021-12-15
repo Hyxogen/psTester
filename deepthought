@@ -1,0 +1,12 @@
+Cleaning object files
+Cleaning push_swap
+Cleaning checker
+push_swap.c
+argument_parser.c
+ps_object.c
+stack.c
+dlinked_list.c
+evaluator.c
+Linking push_swap
+checker.c
+Linking checker

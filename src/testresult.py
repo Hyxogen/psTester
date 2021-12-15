@@ -1,5 +1,16 @@
-from statistics import mean, median, mode, stdev, variance
+# **************************************************************************** #
+#                                                                              #
+#                                                         ::::::::             #
+#    testresult.py                                      :+:    :+:             #
+#                                                      +:+                     #
+#    By: dmeijer <dmeijer@student.codam.nl>           +#+                      #
+#                                                    +#+                       #
+#    Created: 2021/12/15 16:56:47 by dmeijer       #+#    #+#                  #
+#    Updated: 2021/12/15 16:56:47 by dmeijer       ########   odam.nl          #
+#                                                                              #
+# **************************************************************************** #
 
+from statistics import mean, median, mode, stdev, variance
 
 class TestResult:
 	num_range = range[int]

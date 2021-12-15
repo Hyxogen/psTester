@@ -1,12 +1,12 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         ::::::::             #
-#    tests.py                                           :+:    :+:             #
+#    test.py                                            :+:    :+:             #
 #                                                      +:+                     #
 #    By: dmeijer <dmeijer@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2021/12/15 16:00:24 by dmeijer       #+#    #+#                  #
-#    Updated: 2021/12/15 16:27:38 by dmeijer       ########   odam.nl          #
+#    Updated: 2021/12/15 16:35:19 by dmeijer       ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,9 +23,9 @@ executable = args.pop(0)
 for arg in args:
 	numbers.append(int(arg))
 
-def test(exec: str, argv, n) -> int:
-	obj = PushSwapObject(n)
-	proc = subprocess.run(["./" + exec, *argv], text=True, capture_output=True)
+def test(exec: str, numbers: list[int]) -> int:
+	obj = PushSwapObject(numbers)
+	proc = subprocess.run(["./" + exec, *list(map(str, numbers))], text=True, capture_output=True)
 	instructions = proc.stdout.split("\n")
 	if proc.returncode != 0:
 		return -1
@@ -72,7 +72,7 @@ def execute_instruction(instr: str, object: PushSwapObject) -> bool:
 		return False
 	return True
 
-ret = test(executable, args, numbers)
+ret = test(executable, numbers)
 
 if ret <= -1:
 	print("KO")

@@ -6,20 +6,14 @@
 #    By: dmeijer <dmeijer@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2021/12/15 16:56:47 by dmeijer       #+#    #+#                  #
-#    Updated: 2021/12/15 16:56:47 by dmeijer       ########   odam.nl          #
+#    Updated: 2021/12/16 10:01:14 by dmeijer       ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
 from statistics import mean, median, mode, stdev, variance
 
 class TestResult:
-	num_range = range[int]
-	results = list[int]
-	results_sorted = list[int]
-	success_count = int
-	success = bool
-
-	def __init__(self, num_range: range[int], results: list[int], succcess_count: int):
+	def __init__(self, num_range: range, results: list, succcess_count: int):
 		self.num_range = num_range
 		self.results = results
 		self.success_count = succcess_count
@@ -50,3 +44,13 @@ class TestResult:
 		if self.success == False:
 			return 0
 		return stdev(self.results)
+	
+	def min_val(self) -> int:
+		if self.success == False:
+			return 0
+		return min(self.results)
+	
+	def max_val(self) -> int:
+		if self.success == False:
+			return 0
+		return max(self.results)

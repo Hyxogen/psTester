@@ -6,22 +6,23 @@
 #    By: dmeijer <dmeijer@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2021/12/15 16:00:24 by dmeijer       #+#    #+#                  #
-#    Updated: 2021/12/15 16:35:19 by dmeijer       ########   odam.nl          #
+#    Updated: 2021/12/16 14:25:58 by dmeijer       ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
 from asyncio import subprocess
-from xmlrpc.client import boolean
-from checker import PushSwapObject
+from src.checker import PushSwapObject
 import subprocess
 import sys
 
-args = sys.argv
-numbers = []
-args.pop(0)
-executable = args.pop(0)
-for arg in args:
-	numbers.append(int(arg))
+# args = sys.argv
+# numbers = []
+# args.pop(0)
+# executable = args.pop(0)
+# for arg in args:
+# 	numbers.append(int(arg))
+
+
 
 def test(exec: str, numbers: list[int]) -> int:
 	obj = PushSwapObject(numbers)
@@ -33,6 +34,8 @@ def test(exec: str, numbers: list[int]) -> int:
 	if ret == False:
 		return -1
 	if obj.is_sorted() == False:
+		# print("Not sorted")
+		# obj.printa()
 		return -1
 	return len(instructions)
 
@@ -72,9 +75,20 @@ def execute_instruction(instr: str, object: PushSwapObject) -> bool:
 		return False
 	return True
 
-ret = test(executable, numbers)
+# # x = "pb\npb\nrrb\npb\nrb\npb\nrb\npb\nrr\npb\nrb\npb\nrb\npb\nrrb\nrrb\npb\nrb\nrb\nrb\nrb\npa\npa\npa\npa\npa\npa\npa\npa\npa"
+# # y = PushSwapObject(numbers)
+# # print(execute_instructions(x.split("\n"), y))
 
-if ret <= -1:
-	print("KO")
-else:
-	print("OK[{}]".format(ret))
+# ret = test(executable, numbers)
+
+# if ret <= -1:
+# 	print("KO")
+# else:
+# 	print("OK[{}]".format(ret))
+
+# ret = test(executable, numbers)
+
+# if ret <= -1:
+# 	print("KO")
+# else:
+# 	print("OK[{}]".format(ret))

@@ -6,38 +6,33 @@
 #    By: dmeijer <dmeijer@student.codam.nl>           +#+                      #
 #                                                    +#+                       #
 #    Created: 2021/12/15 16:00:24 by dmeijer       #+#    #+#                  #
-#    Updated: 2021/12/16 14:25:58 by dmeijer       ########   odam.nl          #
+#    Updated: 2021/12/16 16:16:15 by dmeijer       ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
-from asyncio import subprocess
-from src.checker import PushSwapObject
-import subprocess
-import sys
+import asyncio
+from random import shuffle
+from pushswap import PushSwapObject
+import process
 
-# args = sys.argv
-# numbers = []
-# args.pop(0)
-# executable = args.pop(0)
-# for arg in args:
-# 	numbers.append(int(arg))
+gSem = None
 
-
-
-def test(exec: str, numbers: list[int]) -> int:
+async def Test(exec: str, numbers: list[int]):
 	obj = PushSwapObject(numbers)
-	proc = subprocess.run(["./" + exec, *list(map(str, numbers))], text=True, capture_output=True)
-	instructions = proc.stdout.split("\n")
-	if proc.returncode != 0:
-		return -1
-	ret = execute_instructions(instructions, obj)
-	if ret == False:
-		return -1
-	if obj.is_sorted() == False:
-		# print("Not sorted")
-		# obj.printa()
-		return -1
-	return len(instructions)
+	code, out, err = await process.ExecuteProcess(exec, map(str, numbers), gSem)
+	instr_count = 0
+	if code != 0:
+		return False, None
+	while True:
+		data = out.readline()
+		if not data:
+			break
+		line = data.decode("ascii").rstrip()
+		execute_instruction(line, obj)
+		instr_count += 1
+	if not obj.is_sorted():
+		return False, None
+	return True, instr_count
 
 def execute_instructions(instructions: list, object: PushSwapObject) -> bool:
 	for inst in instructions:
@@ -68,27 +63,20 @@ def execute_instruction(instr: str, object: PushSwapObject) -> bool:
 		object.pb()
 	elif instr == "pa":
 		object.pa()
-	elif instr == "":#TODO just not parse this instruction
-		return True
 	else:
 		print("Unkown instruction:{}".format(instr))
 		return False
 	return True
 
-# # x = "pb\npb\nrrb\npb\nrb\npb\nrb\npb\nrr\npb\nrb\npb\nrb\npb\nrrb\nrrb\npb\nrb\nrb\nrb\nrb\npa\npa\npa\npa\npa\npa\npa\npa\npa"
-# # y = PushSwapObject(numbers)
-# # print(execute_instructions(x.split("\n"), y))
+async def main():
+	global gSem
+	test_lists = []
+	gSem = asyncio.Semaphore(10)
+	for i in range(0, 50):
+		l = list(range(0, i + 1))
+		shuffle(l)
+		test_lists.append(l)
+	await asyncio.gather(*[Test("../../push_swap", test_list) for test_list in test_lists])
 
-# ret = test(executable, numbers)
-
-# if ret <= -1:
-# 	print("KO")
-# else:
-# 	print("OK[{}]".format(ret))
-
-# ret = test(executable, numbers)
-
-# if ret <= -1:
-# 	print("KO")
-# else:
-# 	print("OK[{}]".format(ret))
+if __name__ == "__main__":
+	asyncio.run(main())

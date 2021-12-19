@@ -13,31 +13,58 @@
 import asyncio
 from random import shuffle
 from pushswap import PushSwapObject
+from testresult import TestResult
 import process
 
 gSem = None
 
 
-async def Test(exec: str, numbers: list):
+async def Test(exec: str, numbers: list) -> int:
     obj = PushSwapObject(numbers)
     code, out, err = await process.ExecuteProcess(exec, map(str, numbers), gSem)
     instr_count = 0
     if code != 0:
-        return False, None
+        return -1
     while True:
         data = await out.readline()
         if not data:
             break
         line = data.decode("ascii").rstrip()
         if not execute_instruction(line, obj):
-            return False, None
+            return -1
         instr_count += 1
     if not obj.is_sorted():
-        print("KO:\"{}\"".format(" ".join(map(str, numbers))))
-        return False, None
-    print("OK")
-    return True, instr_count
+        return -1
+    print("OK[{}]".format(instr_count))
+    return instr_count
 
+
+async def TestRange(execn: str, shuffle_count: int, number_range: range) -> TestResult:
+    test_lists = []
+    results = []
+    success_count = 0
+    for i in range(0, shuffle_count):
+        test_list = list(number_range)
+        shuffle(test_list)
+        test_lists.append(test_list)
+    for test_list in test_lists:
+        result = await Test(execn, test_list)
+        results.append(result)
+        success_count += 1 if result >= 0 else 0
+    # await asyncio.gather(*[results.append(Test(execn, testList)) for testList in test_lists])
+    return TestResult(number_range, results, success_count)
+
+
+async def NewTestRun(execn: str, shuffle_count: int, test_range: range) -> list:
+    ranges = []
+    results = []
+    for i in test_range:
+        ranges.append(range(0, i))
+    for number_range in ranges:
+        result = await TestRange(execn, shuffle_count, number_range)
+        results.append(result)
+    # await asyncio.gather(*[results.append(TestRange(execn, shuffle_count, number_range)) for number_range in ranges])
+    return results
 
 def execute_instructions(instructions: list, object: PushSwapObject) -> bool:
     for inst in instructions:
@@ -77,13 +104,9 @@ def execute_instruction(instr: str, object: PushSwapObject) -> bool:
 
 async def main():
     global gSem
-    test_lists = []
     gSem = asyncio.Semaphore(10)
-    for i in range(0, 50):
-        l = list(range(0, i + 1))
-        shuffle(l)
-        test_lists.append(l)
-    await asyncio.gather(*[Test("../../push_swap", test_list) for test_list in test_lists])
+    # await NewTestRun("../../push_swap", 20, range(0, 20))
+    await asyncio.gather(NewTestRun("../../push_swap", 20, range(0, 20)))
 
 
 if __name__ == "__main__":

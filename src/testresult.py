@@ -9,7 +9,7 @@
 #    Updated: 2021/12/16 10:01:14 by dmeijer       ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
-
+import math
 from statistics import mean, median, mode, stdev, variance
 
 class TestResult:
@@ -54,3 +54,14 @@ class TestResult:
 		if self.success == False:
 			return 0
 		return max(self.results)
+
+
+def is_better(b: TestResult, a: TestResult):
+	a_av = a.average()
+	a_std = a.standard_deviation()
+	b_av = b.average()
+	b_count = len(b.results)
+	test = (1.65 * a_std) / math.sqrt(b_count)
+	if b_av < (a_av - test):
+		return True
+	return False

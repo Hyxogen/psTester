@@ -11,10 +11,16 @@
 # **************************************************************************** #
 
 import asyncio
+import json
 from random import shuffle
+
+from typing import List
+
 from pushswap import PushSwapObject
 from testresult import TestResult
+from testresult import is_better
 import process
+import itertools
 
 gSem = None
 
@@ -35,7 +41,6 @@ async def Test(exec: str, numbers: list) -> int:
         instr_count += 1
     if not obj.is_sorted():
         return -1
-    print("OK[{}]".format(instr_count))
     return instr_count
 
 
@@ -51,8 +56,15 @@ async def TestRange(execn: str, shuffle_count: int, number_range: range) -> Test
         result = await Test(execn, test_list)
         results.append(result)
         success_count += 1 if result >= 0 else 0
-    # await asyncio.gather(*[results.append(Test(execn, testList)) for testList in test_lists])
     return TestResult(number_range, results, success_count)
+
+
+async def print_result(result: TestResult):
+    print("Ave:{}, Med:{}, Mod:{}, Var:{}, Std:{}, Min:{}, Max:{}".format(result.average(), result.median(),
+                                                                          result.mode(),
+                                                                          result.variance(),
+                                                                          result.standard_deviation(), result.min_val(),
+                                                                          result.max_val()))
 
 
 async def NewTestRun(execn: str, shuffle_count: int, test_range: range) -> list:
@@ -62,9 +74,10 @@ async def NewTestRun(execn: str, shuffle_count: int, test_range: range) -> list:
         ranges.append(range(0, i))
     for number_range in ranges:
         result = await TestRange(execn, shuffle_count, number_range)
+        await print_result(result)
         results.append(result)
-    # await asyncio.gather(*[results.append(TestRange(execn, shuffle_count, number_range)) for number_range in ranges])
     return results
+
 
 def execute_instructions(instructions: list, object: PushSwapObject) -> bool:
     for inst in instructions:
@@ -102,11 +115,77 @@ def execute_instruction(instr: str, object: PushSwapObject) -> bool:
     return True
 
 
+def print_result_new(new_result: TestResult, comp_result: TestResult):
+    if new_result.num_range != comp_result.num_range:
+        print("Invalid comparison!")
+    if is_better(new_result, comp_result):
+        print("New result for range ({},{}) is better than old!".format(new_result.num_range.start
+                                                                        , new_result.num_range.stop))
+    else:
+        print("New result for range ({},{}) is NOT better than old!".format(new_result.num_range.start
+                                                                            , new_result.num_range.stop))
+
+
+def print_results_new(new_results: list, comp_results: list):
+    for (new_result, comp_result) in zip(new_results, comp_results):
+        print_result_new(new_result, comp_result)
+
+
+def save_result(result: TestResult):
+    x = {
+        "results": result.results,
+        "success_count": result.success_count
+    }
+    return x
+
+
+def save_results(filen: str, results: List[TestResult]):
+    file = open(filen, "r")
+    save = json.load(file)
+    file.close()
+    x = {}
+    count = save['count']
+    for result in results:
+        x["{}-{}".format(result.num_range.start, result.num_range.stop)] = save_result(result)
+    save[count + 1] = x
+    save['count'] = count + 1
+    file = open(filen, "w")
+    file.write(json.dumps(save))
+
+
+def parse_saved_test(obj: dict) -> List[TestResult]:
+    ret = []
+    for (key, val) in obj.items():
+        low = int(key.split("-")[0])
+        hi = int(key.split("-")[1])
+        ret.append(TestResult(range(low, hi), val['results'], val['success_count']))
+    return ret
+
+
+def get_best(filen: str) -> List[TestResult]:
+    file = open(filen, "r")
+    save = json.load(file)
+    best_index = save['best']
+    if best_index == -1:
+        return list()
+    return parse_saved_test(save["{}".format(best_index)])
+
+
+async def run_and_save(filen: str, execn: str):
+    results = await NewTestRun(execn, 10, range(0, 10))
+    save_results(filen, results)
+    best_results = get_best(filen)
+    print_results_new(results, best_results)
+    # for result in best_results:
+    #     await print_result(result)
+
+
 async def main():
     global gSem
-    gSem = asyncio.Semaphore(10)
+    gSem = asyncio.Semaphore(50)
     # await NewTestRun("../../push_swap", 20, range(0, 20))
-    await asyncio.gather(NewTestRun("../../push_swap", 20, range(0, 20)))
+    # await asyncio.gather(NewTestRun("../../push_swap", 50, range(0, 10)))
+    await asyncio.gather(run_and_save("../data/data.json", "../../push_swap"))
 
 
 if __name__ == "__main__":

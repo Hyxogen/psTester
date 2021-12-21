@@ -19,6 +19,7 @@ from typing import List
 from pushswap import PushSwapObject
 from testresult import TestResult
 from testresult import is_better
+from savefile import SaveFile
 import process
 import itertools
 
@@ -131,53 +132,16 @@ def print_results_new(new_results: list, comp_results: list):
         print_result_new(new_result, comp_result)
 
 
-def save_result(result: TestResult):
-    x = {
-        "results": result.results,
-        "success_count": result.success_count
-    }
-    return x
-
-
-def save_results(filen: str, results: List[TestResult]):
-    file = open(filen, "r")
-    save = json.load(file)
-    file.close()
-    x = {}
-    count = save['count']
-    for result in results:
-        x["{}-{}".format(result.num_range.start, result.num_range.stop)] = save_result(result)
-    save[count + 1] = x
-    save['count'] = count + 1
-    file = open(filen, "w")
-    file.write(json.dumps(save))
-
-
-def parse_saved_test(obj: dict) -> List[TestResult]:
-    ret = []
-    for (key, val) in obj.items():
-        low = int(key.split("-")[0])
-        hi = int(key.split("-")[1])
-        ret.append(TestResult(range(low, hi), val['results'], val['success_count']))
-    return ret
-
-
-def get_best(filen: str) -> List[TestResult]:
-    file = open(filen, "r")
-    save = json.load(file)
-    best_index = save['best']
-    if best_index == -1:
-        return list()
-    return parse_saved_test(save["{}".format(best_index)])
+def save_results(save_file: SaveFile, results: List[TestResult]):
+    save_file.add_run(results)
 
 
 async def run_and_save(filen: str, execn: str):
+    save_file = SaveFile(filen)
     results = await NewTestRun(execn, 10, range(0, 10))
-    save_results(filen, results)
-    best_results = get_best(filen)
+    best_results = save_file.get_best_run()
     print_results_new(results, best_results)
-    # for result in best_results:
-    #     await print_result(result)
+    save_file.save_file()
 
 
 async def main():

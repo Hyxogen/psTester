@@ -68,7 +68,7 @@ async def print_result(result: TestResult):
                                                                           result.max_val()))
 
 
-async def NewTestRun(execn: str, shuffle_count: int, test_range: range) -> list:
+async def NewTestRun(execn: str, shuffle_count: int, test_range: range) -> List[TestResult]:
     ranges = []
     results = []
     for i in test_range:
@@ -132,15 +132,16 @@ def print_results_new(new_results: list, comp_results: list):
         print_result_new(new_result, comp_result)
 
 
-def save_results(save_file: SaveFile, results: List[TestResult]):
-    save_file.add_run(results)
-
-
 async def run_and_save(filen: str, execn: str):
     save_file = SaveFile(filen)
     results = await NewTestRun(execn, 10, range(0, 10))
-    best_results = save_file.get_best_run()
-    print_results_new(results, best_results)
+    for result in results:
+        comp = save_file.get_best(result.num_range)
+        if not comp:
+            save_file.add_result(result, True)
+            print("No previous entry to compare to")
+        else:
+            print_result_new(result, comp)
     save_file.save_file()
 
 

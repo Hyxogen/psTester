@@ -59,7 +59,7 @@ class SaveFile:
     def create_and_add_range(self, num_range: range) -> dict:
         range_info = {
             "best": -1,
-            "count": -1,
+            "count": 0,
             "entries": []
         }
         self.jsonobj[get_range_str(num_range)] = range_info
@@ -73,7 +73,7 @@ class SaveFile:
         entry = create_entry(result)
         range_info["entries"].append(entry)
         if new_best:
-            range_info["best"] = count + 1;
+            range_info["best"] = count
         range_info["count"] += 1
 
     def save_file(self):
